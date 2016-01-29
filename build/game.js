@@ -17,11 +17,14 @@ Object.defineProperty(exports, "__esModule", {
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Person = exports.Person = function () {
-    function Person(game, properties) {
+    function Person(game) {
+        var properties = arguments.length <= 1 || arguments[1] === undefined ? { x: 0, y: 0 } : arguments[1];
+
         _classCallCheck(this, Person);
 
         this.game = game;
-        this.sprite = game.add.sprite(properties.x, properties.y, 'person');
+        var sprite = game.add.sprite(properties.x, properties.y, 'person');
+        _.extend(this, sprite);
     }
 
     _createClass(Person, null, [{
@@ -76,9 +79,19 @@ var SocialGame = exports.SocialGame = function SocialGame(Phaser, config) {
             _World.World.create(_this, _this.game);
             _Person.Person.create(_this, _this.game);
 
-            var world = new _World.World(_this.game);
-            var dude = new _Person.Person(_this.game, { x: 256, y: 256 });
-            world.add(dude);
+            _this.world = new _World.World(_this.game);
+
+            var dude1 = new _Person.Person(_this.game, { x: 200, y: 256, mood: 'happy' });
+            world.add(dude1);
+
+            var dude2 = new _Person.Person(_this.game, { x: 50, y: 150, mood: 'happy' });
+            world.add(dude2);
+
+            var dude3 = new _Person.Person(_this.game, { x: 400, y: 50, mood: 'happy' });
+            world.add(dude3);
+
+            var dude4 = new _Person.Person(_this.game, { x: 500, y: 350, mood: 'happy' });
+            world.add(dude4);
         },
         update: function update() {}
     };

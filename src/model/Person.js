@@ -1,7 +1,8 @@
 export class Person {
-    constructor(game, properties) {
+    constructor(game, properties={ x:0, y:0 }) {
         this.game = game;
-        this.sprite = game.add.sprite(properties.x, properties.y, 'person')
+        let sprite = game.add.sprite(properties.x, properties.y, 'person');
+        _.extend(this, sprite);
     }
 
     static preload(context, game) {
