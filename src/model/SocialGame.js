@@ -20,8 +20,11 @@ export class SocialGame  {
             },
             create: () => {
                 World.create(this, this.game);
-                let world = new World()
                 Person.create(this, this.game);
+
+                let world = new World(this.game);
+                let dude = new Person(this.game, { x: 256, y:256 });
+                world.add(dude);
             },
             update: () => {
             }

@@ -35,7 +35,7 @@ module.exports = function(grunt) {
         files: [
           { src: ['lib/lodash/lodash.min.js'], dest: 'build/lib/lodash/lodash.min.js' },
           { src: ['lib/vendor/phaser/phaser.min.js'], dest: 'build/lib/vendor/phaser/phaser.min.js' },
-          { cwd: 'src/', src: ['/images/**/*.*'], dest: '../build/', expand: true }
+          { cwd: 'src/images/', src: ['**/*.png'], dest: 'build/images', expand: true }
         ]
       }
     },

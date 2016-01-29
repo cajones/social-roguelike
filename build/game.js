@@ -21,21 +21,14 @@ var Person = exports.Person = function () {
         _classCallCheck(this, Person);
 
         this.game = game;
+        this.sprite = game.add.sprite(properties.x, properties.y, 'person');
     }
 
-    _createClass(Person, [{
-        key: 'spawn',
-        value: function spawn() {
-            var x = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
-            var y = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
-
-            this.sprite = game.add.sprite(x, y, 'person');
-        }
-    }], [{
+    _createClass(Person, null, [{
         key: 'preload',
         value: function preload(context, game) {
             console.log('preloading Person');
-            game.load.spritesheet('person', '/images/moods.png', 64, 64);
+            game.load.spritesheet('person', '/images/person.png', 128, 128);
         }
     }, {
         key: 'create',
@@ -81,8 +74,11 @@ var SocialGame = exports.SocialGame = function SocialGame(Phaser, config) {
         },
         create: function create() {
             _World.World.create(_this, _this.game);
-            var world = new _World.World();
             _Person.Person.create(_this, _this.game);
+
+            var world = new _World.World(_this.game);
+            var dude = new _Person.Person(_this.game, { x: 256, y: 256 });
+            world.add(dude);
         },
         update: function update() {}
     };
@@ -108,9 +104,20 @@ var World = exports.World = function () {
         _classCallCheck(this, World);
 
         this.game = game;
+        this.population = [];
     }
 
-    _createClass(World, null, [{
+    _createClass(World, [{
+        key: 'add',
+        value: function add(entity) {
+            var x = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+            var y = arguments.length <= 2 || arguments[2] === undefined ? 0 : arguments[2];
+
+            entity.x = x;
+            entity.y = y;
+            this.population.push(entity);
+        }
+    }], [{
         key: 'preload',
         value: function preload(context, game) {
             console.log('preloading World');
