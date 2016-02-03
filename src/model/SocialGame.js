@@ -1,5 +1,6 @@
 import {World} from "./World";
 import {Person} from "./Person";
+import { default as Mood} from "./Mood";
 
 export class SocialGame  {
 
@@ -24,19 +25,23 @@ export class SocialGame  {
 
                 this.world = new World(this.game);
 
-                let dude1 = new Person(this.game, { x: 200, y:256, mood: 'happy' });
-                world.add(dude1);
+                let dude1 = new Person(this.game, { x: 200, y:256, mood: Mood.Happy });
+                this.world.add(dude1);
 
-                let dude2 = new Person(this.game, { x: 50, y:150, mood: 'happy' });
-                world.add(dude2);
+                let dude2 = new Person(this.game, { x: 50, y:150, mood: Mood.Happy });
+                this.world.add(dude2);
 
-                let dude3 = new Person(this.game, { x: 400, y:50, mood: 'happy' });
-                world.add(dude3);
+                let dude3 = new Person(this.game, { x: 400, y:50, mood: Mood.Sad });
+                this.world.add(dude3);
 
-                let dude4 = new Person(this.game, { x: 500, y:350, mood: 'happy' });
-                world.add(dude4);
+                let dude4 = new Person(this.game, { x: 500, y:350, mood: Mood.Happy });
+                this.world.add(dude4);
             },
             update: () => {
+                this.world.update();
+                this.world.population.forEach((entity) => {
+                    entity.update(this.world);
+                });
             }
         };
 

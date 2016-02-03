@@ -5,8 +5,8 @@ var _SocialGame = require('./model/SocialGame');
 
 window.SocialGame = _SocialGame.SocialGame;
 
-},{"./model/SocialGame":3}],2:[function(require,module,exports){
-'use strict';
+},{"./model/SocialGame":5}],2:[function(require,module,exports){
+"use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -16,34 +16,116 @@ Object.defineProperty(exports, "__esModule", {
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Person = exports.Person = function () {
+var Entity = exports.Entity = function () {
+    function Entity() {
+        var properties = arguments.length <= 0 || arguments[0] === undefined ? { x: 0, y: 0 } : arguments[0];
+
+        _classCallCheck(this, Entity);
+
+        this.x = properties.x;
+        this.y = properties.y;
+    }
+
+    _createClass(Entity, [{
+        key: "update",
+        value: function update() {}
+    }]);
+
+    return Entity;
+}();
+
+},{}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.default = {
+    Happy: 0,
+    Sad: 1
+};
+
+},{}],4:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+exports.Person = undefined;
+
+var _Mood = require("./Mood");
+
+var _Mood2 = _interopRequireDefault(_Mood);
+
+var _Entity2 = require("./Entity");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var _mood = Symbol('mood');
+
+var Person = exports.Person = function (_Entity) {
+    _inherits(Person, _Entity);
+
     function Person(game) {
-        var properties = arguments.length <= 1 || arguments[1] === undefined ? { x: 0, y: 0 } : arguments[1];
+        var properties = arguments.length <= 1 || arguments[1] === undefined ? { mood: _Mood2.default.Happy } : arguments[1];
 
         _classCallCheck(this, Person);
 
-        this.game = game;
-        var sprite = game.add.sprite(properties.x, properties.y, 'person');
-        _.extend(this, sprite);
+        var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(Person).call(this, properties));
+
+        _this.game = game;
+        _this.sprite = game.add.sprite(properties.x, properties.y, 'person');
+
+        _this.mood = properties.mood;
+        console.log(_this);
+        return _this;
     }
 
-    _createClass(Person, null, [{
-        key: 'preload',
+    _createClass(Person, [{
+        key: "update",
+        value: function update(world) {}
+    }, {
+        key: "moveTo",
+        value: function moveTo() {
+            var x = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
+            var y = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+
+            this.move(x, y);
+        }
+    }, {
+        key: "mood",
+        get: function get() {
+            return this[_mood];
+        },
+        set: function set(value) {
+            this[_mood] = value;
+            this.sprite.frame = value;
+        }
+    }], [{
+        key: "preload",
         value: function preload(context, game) {
             console.log('preloading Person');
             game.load.spritesheet('person', '/images/person.png', 128, 128);
         }
     }, {
-        key: 'create',
+        key: "create",
         value: function create(context, game) {
             console.log('creating Person');
         }
     }]);
 
     return Person;
-}();
+}(_Entity2.Entity);
 
-},{}],3:[function(require,module,exports){
+},{"./Entity":2,"./Mood":3}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -54,6 +136,12 @@ exports.SocialGame = undefined;
 var _World = require("./World");
 
 var _Person = require("./Person");
+
+var _Mood = require("./Mood");
+
+var _Mood2 = _interopRequireDefault(_Mood);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -81,19 +169,24 @@ var SocialGame = exports.SocialGame = function SocialGame(Phaser, config) {
 
             _this.world = new _World.World(_this.game);
 
-            var dude1 = new _Person.Person(_this.game, { x: 200, y: 256, mood: 'happy' });
-            world.add(dude1);
+            var dude1 = new _Person.Person(_this.game, { x: 200, y: 256, mood: _Mood2.default.Happy });
+            _this.world.add(dude1);
 
-            var dude2 = new _Person.Person(_this.game, { x: 50, y: 150, mood: 'happy' });
-            world.add(dude2);
+            var dude2 = new _Person.Person(_this.game, { x: 50, y: 150, mood: _Mood2.default.Happy });
+            _this.world.add(dude2);
 
-            var dude3 = new _Person.Person(_this.game, { x: 400, y: 50, mood: 'happy' });
-            world.add(dude3);
+            var dude3 = new _Person.Person(_this.game, { x: 400, y: 50, mood: _Mood2.default.Sad });
+            _this.world.add(dude3);
 
-            var dude4 = new _Person.Person(_this.game, { x: 500, y: 350, mood: 'happy' });
-            world.add(dude4);
+            var dude4 = new _Person.Person(_this.game, { x: 500, y: 350, mood: _Mood2.default.Happy });
+            _this.world.add(dude4);
         },
-        update: function update() {}
+        update: function update() {
+            _this.world.update();
+            _this.world.population.forEach(function (entity) {
+                entity.update(_this.world);
+            });
+        }
     };
 
     this.game = new Phaser.Game(this.config.width, this.config.height, Phaser.Canvas, this.config.element, state);
@@ -101,7 +194,7 @@ var SocialGame = exports.SocialGame = function SocialGame(Phaser, config) {
 
 ;
 
-},{"./Person":2,"./World":4}],4:[function(require,module,exports){
+},{"./Mood":3,"./Person":4,"./World":6}],6:[function(require,module,exports){
 'use strict';
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -109,6 +202,9 @@ var _createClass = function () { function defineProperties(target, props) { for 
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
+exports.World = undefined;
+
+var _Entity = require('./Entity');
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -118,9 +214,13 @@ var World = exports.World = function () {
 
         this.game = game;
         this.population = [];
+        this.properties = properties;
     }
 
     _createClass(World, [{
+        key: 'update',
+        value: function update() {}
+    }, {
         key: 'add',
         value: function add(entity) {
             var x = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
@@ -129,6 +229,7 @@ var World = exports.World = function () {
             entity.x = x;
             entity.y = y;
             this.population.push(entity);
+            this.game.physics.arcade.enable(entity);
         }
     }], [{
         key: 'preload',
@@ -139,10 +240,11 @@ var World = exports.World = function () {
         key: 'create',
         value: function create(context, game) {
             console.log('creating World');
+            game.physics.startSystem(Phaser.Physics.ARCADE);
         }
     }]);
 
     return World;
 }();
 
-},{}]},{},[1]);
+},{"./Entity":2}]},{},[1]);
