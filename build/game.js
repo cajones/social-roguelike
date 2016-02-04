@@ -21,9 +21,6 @@ var Entity = exports.Entity = function () {
         var properties = arguments.length <= 0 || arguments[0] === undefined ? { x: 0, y: 0 } : arguments[0];
 
         _classCallCheck(this, Entity);
-
-        this.x = properties.x;
-        this.y = properties.y;
     }
 
     _createClass(Entity, [{
@@ -70,6 +67,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var _mood = Symbol('mood');
+var _destination = Symbol('destination');
 
 var Person = exports.Person = function (_Entity) {
     _inherits(Person, _Entity);
@@ -83,22 +81,42 @@ var Person = exports.Person = function (_Entity) {
 
         _this.game = game;
         _this.sprite = game.add.sprite(properties.x, properties.y, 'person');
+        game.physics.arcade.enable(_this.sprite);
 
         _this.mood = properties.mood;
-        console.log(_this);
+        _this.destination = new Phaser.Point(properties.x, properties.y);
+        _this.target = null;
         return _this;
     }
 
     _createClass(Person, [{
-        key: "update",
-        value: function update(world) {}
+        key: "follow",
+        value: function follow(person) {
+            this.target = person;
+        }
     }, {
         key: "moveTo",
-        value: function moveTo() {
-            var x = arguments.length <= 0 || arguments[0] === undefined ? 0 : arguments[0];
-            var y = arguments.length <= 1 || arguments[1] === undefined ? 0 : arguments[1];
+        value: function moveTo(point) {
+            function approach(body, point) {
+                var maxVelocity = arguments.length <= 2 || arguments[2] === undefined ? 25 : arguments[2];
 
-            this.move(x, y);
+                if (Phaser.Point.equals(body, point)) return;
+
+                if (body.x < point.x) body.velocity.x = Math.min(point.x - body.x, maxVelocity);else if (body.x > point.x) body.velocity.x = Math.min(point.x - body.x, maxVelocity);
+
+                if (body.y < point.y) body.velocity.y = Math.min(point.y - body.y, maxVelocity);else if (body.y > point.y) body.velocity.y = -Math.min(point.y - body.y, maxVelocity);
+            }
+
+            if (point) approach(this.sprite.body, point);
+        }
+    }, {
+        key: "update",
+        value: function update(world) {
+            if (this.target) {
+                this.moveTo(this.target.sprite);
+            } else {
+                this.moveTo(this.destination);
+            }
         }
     }, {
         key: "mood",
@@ -108,6 +126,14 @@ var Person = exports.Person = function (_Entity) {
         set: function set(value) {
             this[_mood] = value;
             this.sprite.frame = value;
+        }
+    }, {
+        key: "destination",
+        get: function get() {
+            return this[_destination];
+        },
+        set: function set(point) {
+            this[_destination] = point;
         }
     }], [{
         key: "preload",
@@ -180,6 +206,11 @@ var SocialGame = exports.SocialGame = function SocialGame(Phaser, config) {
 
             var dude4 = new _Person.Person(_this.game, { x: 500, y: 350, mood: _Mood2.default.Happy });
             _this.world.add(dude4);
+
+            dude2.follow(dude3);
+            dude3.follow(dude4);
+            dude4.follow(dude1);
+            dude1.destination = new Phaser.Point(_this.config.width - 64, _this.config.height - 64);
         },
         update: function update() {
             _this.world.update();

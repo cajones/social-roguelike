@@ -36,6 +36,11 @@ export class SocialGame  {
 
                 let dude4 = new Person(this.game, { x: 500, y:350, mood: Mood.Happy });
                 this.world.add(dude4);
+
+                dude2.follow(dude3);
+                dude3.follow(dude4);
+                dude4.follow(dude1);
+                dude1.destination = new Phaser.Point(this.config.width-64, this.config.height-64);
             },
             update: () => {
                 this.world.update();
